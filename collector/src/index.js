@@ -31,7 +31,6 @@ setupDB().then(() => {
 });
 
 const collect = async () => {
-  console.log('collecting...');
   const resp = await sia.collectHost();
   const spaceUsed = await sia.getStorage();
   const record = {
@@ -48,7 +47,7 @@ const collect = async () => {
 console.log('connecting to sia...');
 sia.prepare().then(() => {
   console.log('connected');
-  schedule.scheduleJob('*/5 * * * * *', () => {
+  schedule.scheduleJob('* * * * *', () => {
     collect();
   });
 });
