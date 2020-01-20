@@ -5,6 +5,8 @@ let siad;
 
 export const prepare = async () => {
   siad = await connect('localhost:9980');
+  const hostData = await collectHost();
+  return R.path(['publickey', 'key'], hostData);
 };
 
 export const collectHost = async () => {
