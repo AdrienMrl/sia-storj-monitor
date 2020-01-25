@@ -3,7 +3,7 @@ import Axios from 'axios';
 const nuageMetricsAPI =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:3002'
-    : 'https://metrics.nuage.sh/api';
+    : 'http://149.56.13.45:3003';
 
 let api;
 
