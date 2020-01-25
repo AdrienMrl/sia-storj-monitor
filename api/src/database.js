@@ -2,14 +2,14 @@ import mongodb from 'mongodb';
 import * as R from 'ramda';
 import logger from './logger';
 
-const url = 'mongodb://localhost:27017';
+const url = 'mongodb://localhost:27018';
 const dbname = 'nuage-metrics';
 const client = new mongodb.MongoClient(url, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   auth: {
-    user: 'nuage',
-    password: 'g97c;>Nw:.`;%[Kq',
+    user: 'sevauk',
+    password: 'kronos',
     //password: 'password'
     //  process.env.NODE_ENV === 'development'
     //    ? 'password'

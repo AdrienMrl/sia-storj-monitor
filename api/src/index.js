@@ -85,6 +85,7 @@ export const register = async (req, res) => {
   const body = R.prop('body', req);
   const email = R.prop('email', body);
   logger.info('Register user', { email });
+  console.log(req.body);
   //  const existingUser = await database.getUser({ email });
   //  if (existingUser) return res.status(401).send({ error: 'user exists' });
   const passwordHash = await bcrypt.hash(req.body.password, 10);

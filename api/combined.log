@@ -102,3 +102,9 @@
 {"port":3002,"level":"info","message":"Listening to incoming request"}
 {"url":"mongodb://localhost:27017","dbname":"nuage-metrics","level":"info","message":"Connected to mongoDB"}
 {"port":3002,"level":"info","message":"Listening to incoming request"}
+{"url":"mongodb://localhost:27017","dbname":"nuage-metrics","level":"info","message":"Connected to mongoDB"}
+{"port":3003,"level":"info","message":"Listening to incoming request"}
+{"level":"info","message":"Register user"}
+{"url":"mongodb://localhost:27017","dbname":"nuage-metrics","level":"info","message":"Connected to mongoDB"}
+{"port":3003,"level":"info","message":"Listening to incoming request"}
+{"level":"info","message":"Register user"}
