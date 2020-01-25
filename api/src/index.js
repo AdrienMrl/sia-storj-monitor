@@ -38,7 +38,7 @@ app.use((err, req, res, next) => {
   }
 });
 app.use(bodyParser.json({ limit: '1mb' }));
-const port = 3002;
+const port = 3003;
 
 app.get('/node/:id/records', authMiddleware, async (req, res) => {
   const nodeId = req.params.id;

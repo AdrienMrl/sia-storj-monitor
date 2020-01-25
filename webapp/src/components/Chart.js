@@ -11,7 +11,7 @@ import {
 } from 'react-vis';
 import '../../node_modules/react-vis/dist/style.css';
 
-const Chart = () => {
+const Chart = ({ data }) => {
   return (
     <div>
       This is a title
@@ -22,11 +22,7 @@ const Chart = () => {
           style={{}}
           curve={'curveMonotoneX'}
           color="#55A5F1"
-          data={[
-            { x: 1, y: 11 },
-            { x: 1.5, y: 29 },
-            { x: 3, y: 7 },
-          ]}
+          data={data}
         />
       </XYPlot>
     </div>

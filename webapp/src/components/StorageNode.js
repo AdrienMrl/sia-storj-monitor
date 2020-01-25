@@ -1,8 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Chart from './Chart';
+import Axios from 'axios';
+
+const transformForUsedSpace = records => {};
 
 const StorageNode = () => {
+  const [records, setRecords] = useState();
+  useEffect(() => {
+    const nodeId = '5e26267a3bd72c785c0798db';
+    Axios({
+      method: 'GET',
+      url: `http://localhost:3002/node/${nodeId}/records`,
+      headers: {
+        Authorization:
+          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZTI1NTBjOGExYzVjMjZmODYyMjE5NGQiLCJpYXQiOjE1Nzk1NjE1NDd9.Po_zgYOY38jwlfdFvj6pB3z8fg4GO6ch8_10IvusBQM',
+      },
+    }).then(resp => setRecords(resp.data));
+  }, []);
+
   return (
     <StorageNode.Wrapper>
       <StorageNode.NodeIdentitiy>
@@ -11,7 +27,7 @@ const StorageNode = () => {
       </StorageNode.NodeIdentitiy>
       <StorageNode.ChartsContent>
         <StorageNode.ChartWrapper>
-          <Chart />
+          <Chart data={transformForUsedSpace(records)} />
         </StorageNode.ChartWrapper>
         <Alerts />
         <StorageNode.ChartWrapper>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import StorageNode from './components/StorageNode';
 import styled from 'styled-components';
-import Axios from 'axios';
 
 const BigNumberBox = ({ title, value }) => (
   <BigNumberBox.Wrapper>
@@ -33,19 +32,6 @@ BigNumberBox.Wrapper = styled.div`
 `;
 
 function App() {
-  const [records, setRecords] = useState();
-  useEffect(() => {
-    const nodeId = '5e26267a3bd72c785c0798db';
-    Axios({
-      method: 'GET',
-      url: `http://localhost:3002/node/${nodeId}/records`,
-      headers: {
-        Authorization:
-          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZTI1NTBjOGExYzVjMjZmODYyMjE5NGQiLCJpYXQiOjE1Nzk1NjE1NDd9.Po_zgYOY38jwlfdFvj6pB3z8fg4GO6ch8_10IvusBQM',
-      },
-    }).then(resp => setRecords(resp.data));
-  }, []);
-  console.log(records);
   return (
     <App.Wrapper>
       <BigNumberBox title="Income Per Month" value="$278" />
