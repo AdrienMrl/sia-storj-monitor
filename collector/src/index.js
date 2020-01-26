@@ -47,7 +47,7 @@ sia.prepare().then(async SiaPubKey => {
     nodeId = R.path(['data', 'nodeId'], registerResp);
   }
   collect(nodeId);
-  schedule.scheduleJob('* * * * *', () => {
+  schedule.scheduleJob('*/30 * * * *', () => {
     collect(nodeId);
   });
 });
