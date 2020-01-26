@@ -1,16 +1,55 @@
+import * as R from 'ramda';
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Chart from './Chart';
 import * as api from '../api';
+import moment from 'moment';
 
-const transformForUsedSpace = records => {};
+const KB = 1000;
+const MB = KB * 1000;
+const GB = MB * 1000;
+const TB = GB * 1000;
+
+const SC = 1000000000000000000000000;
+
+const myPrettyBytes = (count, dec = 3) => {
+  if (count > TB) return `${(count / TB).toFixed(dec)}TB`;
+  else if (count > GB) {
+    return `${(count / GB).toFixed(dec)}GB`;
+  }
+  return `${(count / MB).toFixed(dec)}MB`;
+};
+
+const prettyCurrency = (count, dec = 2) => (count / SC).toFixed(dec) + 'SC';
+
+// TODO: optimize having the server send a timestamp
+const transformForUsedSpace = R.compose(
+  R.map(record => ({
+    x: moment(R.prop('createdAt', record)),
+    y: R.prop('spaceUsed', record),
+  })),
+  R.defaultTo([]),
+);
+
+// TODO: optimize having the server send a timestamp
+// TODO: send numbers
+const transformForIncome = R.compose(
+  R.tap(console.log),
+  R.map(record => ({
+    x: moment(R.prop('createdAt', record)),
+    y:
+      parseInt(record.storagerevenue) +
+      parseInt(record.downloadbandwidthrevenue) +
+      parseInt(record.uploadbandwidthrevenue),
+  })),
+  R.defaultTo([]),
+);
 
 const StorageNode = ({ node }) => {
   const [records, setRecords] = useState();
   useEffect(() => {
     api.getRecords(node._id).then(setRecords);
   }, []);
-  console.log(records);
   return (
     <StorageNode.Wrapper>
       <StorageNode.NodeIdentitiy>
@@ -19,11 +58,31 @@ const StorageNode = ({ node }) => {
       </StorageNode.NodeIdentitiy>
       <StorageNode.ChartsContent>
         <StorageNode.ChartWrapper>
-          <Chart data={transformForUsedSpace(records)} />
+          <Chart
+            data={transformForUsedSpace(records)}
+            toString={point =>
+              point &&
+              `${moment(point.x).format('MM/DD hh:mm')}: ${myPrettyBytes(
+                point.y,
+              )}`
+            }
+            tickFormatX={value => moment(value).format('hh:mm')}
+            tickFormatY={value => myPrettyBytes(value, 0)}
+          />
         </StorageNode.ChartWrapper>
         <Alerts />
         <StorageNode.ChartWrapper>
-          <Chart />
+          <Chart
+            data={transformForIncome(records)}
+            toString={point =>
+              point &&
+              `${moment(point.x).format('MM/DD hh:mm')}: ${prettyCurrency(
+                point.y,
+              )}`
+            }
+            tickFormatX={value => moment(value).format('hh:mm')}
+            tickFormatY={value => prettyCurrency(value, 0)}
+          />
         </StorageNode.ChartWrapper>
       </StorageNode.ChartsContent>
     </StorageNode.Wrapper>
