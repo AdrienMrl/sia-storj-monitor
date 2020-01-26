@@ -48,6 +48,6 @@ sia.prepare().then(async SiaPubKey => {
   }
   collect(nodeId);
   schedule.scheduleJob('* * * * *', () => {
-    collect();
+    collect(nodeId);
   });
 });
