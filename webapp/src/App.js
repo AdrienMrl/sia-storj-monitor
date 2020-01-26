@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import StorageNode from './components/StorageNode';
 import styled from 'styled-components';
+import * as api from './api';
 
 const BigNumberBox = ({ title, value }) => (
   <BigNumberBox.Wrapper>
@@ -32,15 +33,21 @@ BigNumberBox.Wrapper = styled.div`
 `;
 
 function App() {
+  const [nodes, setNodes] = useState();
+  useEffect(() => {
+    api.login('hello@adrienmorel.co', 'kronos').then(resp => {
+      setNodes(resp.hosts);
+    });
+  }, []);
   return (
     <App.Wrapper>
       <BigNumberBox title="Income Per Month" value="$278" />
       <BigNumberBox title="Total Storage" value="32.4TB" />
       <BigNumberBox title="Income Last Month" value="$395" />
-      <StorageNode />
-      <StorageNode />
-      <StorageNode />
-      <StorageNode />
+      {nodes &&
+        nodes.map((node, index) => (
+          <StorageNode key={index.toString()} node={node} />
+        ))}
     </App.Wrapper>
   );
 }

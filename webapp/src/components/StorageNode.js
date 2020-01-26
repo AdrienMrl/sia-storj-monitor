@@ -1,24 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Chart from './Chart';
-import Axios from 'axios';
+import * as api from '../api';
 
 const transformForUsedSpace = records => {};
 
-const StorageNode = () => {
+const StorageNode = ({ node }) => {
   const [records, setRecords] = useState();
   useEffect(() => {
-    const nodeId = '5e26267a3bd72c785c0798db';
-    Axios({
-      method: 'GET',
-      url: `http://localhost:3002/node/${nodeId}/records`,
-      headers: {
-        Authorization:
-          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1ZTI1NTBjOGExYzVjMjZmODYyMjE5NGQiLCJpYXQiOjE1Nzk1NjE1NDd9.Po_zgYOY38jwlfdFvj6pB3z8fg4GO6ch8_10IvusBQM',
-      },
-    }).then(resp => setRecords(resp.data));
+    api.getRecords(node._id).then(setRecords);
   }, []);
-
+  console.log(records);
   return (
     <StorageNode.Wrapper>
       <StorageNode.NodeIdentitiy>

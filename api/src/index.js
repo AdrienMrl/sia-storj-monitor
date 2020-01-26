@@ -47,6 +47,14 @@ app.get('/node/:id/records', authMiddleware, async (req, res) => {
   res.send(records);
 });
 app.post('/user/record', authMiddleware, async (req, res) => {
+  if (!req.body.nodeId) {
+    logger.warn('missing nodeId', {
+      userId: req.user._id,
+      nodeId: req.body.nodeId,
+    });
+    res.send(403);
+    return;
+  }
   await database.createRecord({
     userId: req.user._id,
     ...req.body,
