@@ -5,7 +5,7 @@ import { sendRecord, login, setAuthToken, registerNode } from './api.js';
 
 let nodeId;
 
-const collect = async () => {
+const collect = async nodeId => {
   const resp = await sia.collectHost();
   const spaceUsed = await sia.getStorage();
   const record = {
@@ -18,9 +18,8 @@ const collect = async () => {
     nodeId,
     createdAt: new Date(),
   };
-  console.log('sending record...');
   await sendRecord(record);
-  console.log('sent.');
+  console.log('sent record.');
 };
 
 console.log('connecting to sia...');
@@ -45,9 +44,9 @@ sia.prepare().then(async SiaPubKey => {
       nodeType: 'SIA',
       hostKey: SiaPubKey,
     });
-    const nodeId = R.path(['data', 'nodeId'], registerResp);
+    nodeId = R.path(['data', 'nodeId'], registerResp);
   }
-  collect();
+  collect(nodeId);
   schedule.scheduleJob('* * * * *', () => {
     collect();
   });

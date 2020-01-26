@@ -51,7 +51,7 @@ app.post('/user/record', authMiddleware, async (req, res) => {
     userId: req.user._id,
     ...req.body,
   });
-  logger.debug(`new record from ${req.user._id}`);
+  logger.debug('new record', { userId: req.user._id, nodeId: req.body.nodeId });
   res.send({ success: true });
 });
 app.put('/node', authMiddleware, async (req, res) => {
