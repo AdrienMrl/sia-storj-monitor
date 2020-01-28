@@ -96,10 +96,11 @@ StorageNode.ChartsContent = styled.div`
 `;
 
 StorageNode.ChartWrapper = styled.div`
-  margin: 16px;
+  margin: 6px;
   background: #2e3257;
-  border-radius: 20px;
+  border-radius: 6px;
   padding: 10px;
+  box-shadow: 0 5px 9px 0 rgba(0, 0, 0, 0.2);
 `;
 
 StorageNode.NodeIdentitiy = styled.div`

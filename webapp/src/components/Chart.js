@@ -19,7 +19,7 @@ const Chart = ({ data, toString, tickFormatX, tickFormatY }) => {
   return (
     <div>
       This is a title
-      <XYPlot width={500} height={300}>
+      <XYPlot width={300} height={200}>
         <XAxis title="Time" tickFormat={tickFormatX} />
         <YAxis width={50} title="Storage Usage" tickFormat={tickFormatY} />
         <LineSeries
