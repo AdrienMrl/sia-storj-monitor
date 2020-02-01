@@ -16,14 +16,14 @@ const readConfig = () => {
   }
 }
 
-const collect = async nodeId => {
-  const resp = await sia.collectHost();
-  const spaceUsed = await sia.getStorage();
+const collect = async (nodeId, port) => {
+  const resp = await sia.collectHost(port);
+  const spaceUsed = await sia.getStorage(port);
   const record = {
     type: 'SIA',
     ...R.pick(
       ['storagerevenue', 'downloadbandwidthrevenue', 'uploadbandwidthrevenue', 'contractcompensation'],
-      resp.financialmetrics,
+      resp.data.financialmetrics,
     ),
     spaceUsed,
     nodeId,
@@ -59,9 +59,9 @@ config.hosts.forEach(host => {
       });
       nodeId = R.path(['data', 'nodeId'], registerResp);
     }
-    collect(nodeId);
+    collect(nodeId, host.port);
     schedule.scheduleJob('*/30 * * * *', () => {
-      collect(nodeId);
+      collect(nodeId, host.port);
     });
   });
 

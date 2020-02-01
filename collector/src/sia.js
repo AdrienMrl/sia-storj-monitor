@@ -1,10 +1,10 @@
 import * as R from 'ramda';
 import axios from 'axios';
 
-let siad;
+let siads = {};
 
 export const prepare = async host => {
-  siad = axios.create({
+  siads[host.port] = axios.create({
     baseURL: `http://localhost:${host.port}`,
     auth: {
       username: '',
@@ -17,17 +17,17 @@ export const prepare = async host => {
       },
     },
   });
-  const hostData = await collectHost();
+  const hostData = await collectHost(host.port);
   return R.path(['data', 'publickey', 'key'], hostData);
 }
 
-export const collectHost = async () => {
-  const hostData = await siad.get('/host');
+export const collectHost = async (port) => {
+  const hostData = await siads[port].get('/host');
   return hostData;
 };
 
-export const getStorage = async () => {
-  const resp = await siad.get('/host/storage');
+export const getStorage = async (port) => {
+  const resp = await siads[port].get('/host/storage');
   return R.compose(
     R.sum,
     R.map(
