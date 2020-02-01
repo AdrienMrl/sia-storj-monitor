@@ -1,21 +1,33 @@
 import * as R from 'ramda';
-import { connect } from 'sia.js';
+import axios from 'axios';
 
 let siad;
 
-export const prepare = async () => {
-  siad = await connect('localhost:9980');
+export const prepare = async host => {
+  siad = axios.create({
+    baseURL: `http://localhost:${host.port}`,
+    auth: {
+      username: '',
+      password: host.apipassword
+    },
+    headers: {
+      common: {
+        'Content-Type': 'application/json',
+        'User-Agent': 'Sia-Agent',
+      },
+    },
+  });
   const hostData = await collectHost();
-  return R.path(['publickey', 'key'], hostData);
-};
+  return R.path(['data', 'publickey', 'key'], hostData);
+}
 
 export const collectHost = async () => {
-  const hostData = await siad.call('/host');
+  const hostData = await siad.get('/host');
   return hostData;
 };
 
 export const getStorage = async () => {
-  const resp = await siad.call('/host/storage');
+  const resp = await siad.get('/host/storage');
   return R.compose(
     R.sum,
     R.map(
@@ -23,6 +35,6 @@ export const getStorage = async () => {
         parseInt(R.prop('capacity', folder)) -
         parseInt(R.prop('capacityremaining', folder)),
     ),
-    R.prop('folders'),
+    R.path(['data', 'folders']),
   )(resp);
 };
