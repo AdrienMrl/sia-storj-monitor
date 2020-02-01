@@ -11,7 +11,7 @@ const collect = async nodeId => {
   const record = {
     type: 'SIA',
     ...R.pick(
-      ['storagerevenue', 'downloadbandwidthrevenue', 'uploadbandwidthrevenue'],
+      ['storagerevenue', 'downloadbandwidthrevenue', 'uploadbandwidthrevenue', 'contractcompensation'],
       resp.financialmetrics,
     ),
     spaceUsed,
