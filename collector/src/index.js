@@ -4,8 +4,6 @@ import schedule from 'node-schedule';
 import { sendRecord, login, setAuthToken, registerNode } from './api.js';
 import fs from 'fs';
 
-let nodeId;
-
 const readConfig = () => {
   try {
     const content = fs.readFileSync('/etc/hostmonitor/config.json');
@@ -44,7 +42,7 @@ config.hosts.forEach(host => {
     setAuthToken(resp.data.token);
     console.log('login success');
     //SiaPubKey = 'foobar2';
-    nodeId = R.prop(
+    const nodeId = R.prop(
       '_id',
       R.find(k => k.hostKey === SiaPubKey, resp.data.hosts),
     );
