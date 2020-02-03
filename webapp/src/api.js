@@ -3,7 +3,7 @@ import * as R from 'ramda';
 
 const getInstance = token =>
   axios.create({
-    baseURL: `http://149.56.13.45:3003`,
+    baseURL: `https://metrics-api.nuage.sh`,
     headers: {
       common: {
         Authorization: token && `Bearer ${token}`,
