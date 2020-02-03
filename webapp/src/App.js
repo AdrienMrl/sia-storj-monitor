@@ -1,7 +1,10 @@
+import * as R from 'ramda';
 import React, { useState, useEffect } from 'react';
 import StorageNode from './components/StorageNode';
 import styled from 'styled-components';
 import * as api from './api';
+import { prettyCurrency, extractRevenueFromRecord, myPrettyBytes } from './components/helpers';
+import useMap from 'react-hanger/array/useMap';
 
 const BigNumberBox = ({ title, value }) => (
   <BigNumberBox.Wrapper>
@@ -32,8 +35,31 @@ BigNumberBox.Wrapper = styled.div`
   padding: 20px;
 `;
 
+const computeTotalIncome = R.compose(
+  prettyCurrency,
+  R.sum,
+  R.map(records => {
+    if (records.length < 1)
+      return 0;
+    const revenueOld = records[0];
+    const revenueNew = records[records.length - 1];
+    return extractRevenueFromRecord(revenueNew) - extractRevenueFromRecord(revenueOld);
+  }),
+  map => Array.from(map.values()),
+);
+
+const computeTotalStorage = R.compose(
+  total => myPrettyBytes(total, 0),
+  R.sum,
+  R.pluck('spaceUsed'),
+  R.map(R.last),
+  map => Array.from(map.values())
+);
+
 function App() {
   const [nodes, setNodes] = useState();
+  const [totalMetrics, { set }] = useMap();
+
   useEffect(() => {
     api.login('hello@adrienmorel.co', 'kronos').then(resp => {
       setNodes(resp.hosts);
@@ -41,12 +67,14 @@ function App() {
   }, []);
   return (
     <App.Wrapper>
-      <BigNumberBox title="Income Per Month" value="$278" />
-      <BigNumberBox title="Total Storage" value="32.4TB" />
-      <BigNumberBox title="Income Last Month" value="$395" />
+      <BigNumberBox title="Income 30 days" value={computeTotalIncome(totalMetrics)} />
+      <BigNumberBox title="Total Storage" value={computeTotalStorage(totalMetrics)} />
+      <BigNumberBox title="Income Last Month" value="$-.--" />
       {nodes &&
         nodes.map((node, index) => (
-          <StorageNode key={index.toString()} node={node} />
+          <StorageNode key={index.toString()} node={node} onFetchedMetrics30={(records) => {
+            set(node._id, records);
+          }} />
         ))}
     </App.Wrapper>
   );

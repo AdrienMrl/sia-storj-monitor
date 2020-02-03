@@ -25,6 +25,5 @@ export const login = async (email, password) => {
 
 export const getRecords = async nodeId => {
   const resp = await api.get(`/node/${nodeId}/records`);
-  console.log(resp);
   return R.path(['data'], resp);
 };

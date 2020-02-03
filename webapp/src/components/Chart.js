@@ -13,14 +13,14 @@ import {
 } from 'react-vis';
 import '../../node_modules/react-vis/dist/style.css';
 
-const Chart = ({ data, toString, tickFormatX, tickFormatY }) => {
+const Chart = ({ title, data, toString, tickFormatX, tickFormatY }) => {
   const [hoverPoint, setHoverPoint] = useState();
 
   return (
     <div>
-      This is a title
+      {title}
       <XYPlot width={300} height={200}>
-        <XAxis title="Time" tickFormat={tickFormatX} />
+        <XAxis title="Date" tickFormat={tickFormatX} />
         <YAxis width={50} title="Storage Usage" tickFormat={tickFormatY} />
         <LineSeries
           style={{}}

@@ -4,23 +4,7 @@ import styled from 'styled-components';
 import Chart from './Chart';
 import * as api from '../api';
 import moment from 'moment';
-
-const KB = 1000;
-const MB = KB * 1000;
-const GB = MB * 1000;
-const TB = GB * 1000;
-
-const SC = 1000000000000000000000000;
-
-const myPrettyBytes = (count, dec = 3) => {
-  if (count > TB) return `${(count / TB).toFixed(dec)}TB`;
-  else if (count > GB) {
-    return `${(count / GB).toFixed(dec)}GB`;
-  }
-  return `${(count / MB).toFixed(dec)}MB`;
-};
-
-const prettyCurrency = (count, dec = 2) => (count / SC).toFixed(dec) + 'SC';
+import { prettyCurrency, extractRevenueFromRecord, myPrettyBytes } from './helpers';
 
 // TODO: optimize having the server send a timestamp
 const transformForUsedSpace = R.compose(
@@ -34,27 +18,27 @@ const transformForUsedSpace = R.compose(
 // TODO: optimize having the server send a timestamp
 // TODO: send numbers
 const transformForIncome = R.compose(
-  R.tap(console.log),
   R.map(record => ({
     x: moment(R.prop('createdAt', record)),
     y:
-      parseInt(record.storagerevenue) +
-      parseInt(record.downloadbandwidthrevenue) +
-      parseInt(record.uploadbandwidthrevenue),
+      extractRevenueFromRecord(record),
   })),
   R.defaultTo([]),
 );
 
-const StorageNode = ({ node }) => {
+const StorageNode = ({ node, onFetchedMetrics30 }) => {
   const [records, setRecords] = useState();
   useEffect(() => {
-    api.getRecords(node._id).then(setRecords);
+    api.getRecords(node._id).then(recs => {
+      setRecords(recs);
+      onFetchedMetrics30(recs.filter(rec => moment(rec.createdAt) >= moment().subtract(30, 'days')));
+    });
   }, []);
   return (
     <StorageNode.Wrapper>
       <StorageNode.NodeIdentitiy>
         <StorageNode.OnlineIndicator alt="Online" online />
-        pi@43.54.124.95 [STORJ]
+        {node.username}@{node.ip} [{node.nodeType}]
       </StorageNode.NodeIdentitiy>
       <StorageNode.ChartsContent>
         <StorageNode.ChartWrapper>
@@ -66,7 +50,7 @@ const StorageNode = ({ node }) => {
                 point.y,
               )}`
             }
-            tickFormatX={value => moment(value).format('hh:mm')}
+            tickFormatX={value => moment(value).format('M/DD')}
             tickFormatY={value => myPrettyBytes(value, 0)}
           />
         </StorageNode.ChartWrapper>
@@ -162,26 +146,27 @@ const Separator = styled.div`
 `;
 
 const Alerts = () => {
+  return null;
   return (
     <Alerts.Wrapper>
       <Alerts.Title>CONTROL PANEL</Alerts.Title>
       <AlertItem
         title="Wallet is locked"
-        onClick={() => {}}
+        onClick={() => { }}
         action="UNLOCK"
         actionColor="#e35e68"
       />
       <Separator />
       <AlertItem
         title="Storage Pricing 200SC"
-        onClick={() => {}}
+        onClick={() => { }}
         action="+100SC"
         actionColor="#8AC64F"
       />
       <Separator />
       <AlertItem
         title="Download Bandwidth Pricing 500SC"
-        onClick={() => {}}
+        onClick={() => { }}
         action="+200SC"
         actionColor="#8AC64F"
       />
