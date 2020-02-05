@@ -19,7 +19,9 @@ const Chart = ({ title, data, toString, tickFormatX, tickFormatY }) => {
   return (
     <div>
       {title}
-      <XYPlot width={300} height={200}>
+      <XYPlot width={300} height={200}
+        onMouseLeave={() => setHoverPoint(undefined)}
+      >
         <XAxis title="Date" tickFormat={tickFormatX} />
         <YAxis width={50} title={title} tickFormat={tickFormatY} />
         <LineSeries
