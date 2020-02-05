@@ -1,5 +1,7 @@
 import Axios from 'axios';
 
+process.env.NODE_ENV = 'prod';
+
 const nuageMetricsAPI =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:3002'
