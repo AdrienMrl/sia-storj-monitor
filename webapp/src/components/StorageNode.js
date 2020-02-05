@@ -43,6 +43,7 @@ const StorageNode = ({ node, onFetchedMetrics30 }) => {
       <StorageNode.ChartsContent>
         <StorageNode.ChartWrapper>
           <Chart
+            title="Storage Used"
             data={transformForUsedSpace(records)}
             toString={point =>
               point &&
@@ -57,6 +58,7 @@ const StorageNode = ({ node, onFetchedMetrics30 }) => {
         <Alerts />
         <StorageNode.ChartWrapper>
           <Chart
+            title="Income"
             data={transformForIncome(records)}
             toString={point =>
               point &&

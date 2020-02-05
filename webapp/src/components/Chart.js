@@ -21,7 +21,7 @@ const Chart = ({ title, data, toString, tickFormatX, tickFormatY }) => {
       {title}
       <XYPlot width={300} height={200}>
         <XAxis title="Date" tickFormat={tickFormatX} />
-        <YAxis width={50} title="Storage Usage" tickFormat={tickFormatY} />
+        <YAxis width={50} title={title} tickFormat={tickFormatY} />
         <LineSeries
           style={{}}
           curve={'curveMonotoneX'}

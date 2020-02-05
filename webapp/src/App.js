@@ -39,7 +39,7 @@ const computeTotalIncome = R.compose(
   prettyCurrency,
   R.sum,
   R.map(records => {
-    if (records.length < 1)
+    if (records.length < 1 || records[0].type === 'STORJ')
       return 0;
     const revenueOld = records[0];
     const revenueNew = records[records.length - 1];
