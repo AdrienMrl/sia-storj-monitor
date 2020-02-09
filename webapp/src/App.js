@@ -69,7 +69,6 @@ function App() {
     <App.Wrapper>
       <BigNumberBox title="Income 30 days" value={computeTotalIncome(totalMetrics)} />
       <BigNumberBox title="Total Storage" value={computeTotalStorage(totalMetrics)} />
-      <BigNumberBox title="Income Last Month" value="$-.--" />
       {nodes &&
         nodes.map((node, index) => (
           <StorageNode key={index.toString()} node={node} onFetchedMetrics30={(records) => {

@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import Chart from './Chart';
 import * as api from '../api';
 import moment from 'moment';
-import { prettyCurrency, extractRevenueFromRecord, myPrettyBytes } from './helpers';
+import { prettyCurrency, extractRevenueFromRecord, myPrettyBytes, TB, blockToMonth } from './helpers';
 
 // TODO: optimize having the server send a timestamp
 const transformForUsedSpace = R.compose(
@@ -37,10 +37,11 @@ const StorageNode = ({ node, onFetchedMetrics30 }) => {
   return (
     <StorageNode.Wrapper>
       <StorageNode.NodeIdentitiy>
-        <StorageNode.OnlineIndicator alt="Online" online />
+        <StorageNode.OnlineIndicator alt="Online" online={node.nodeType === 'STORJ' || (node.nodeType === 'SIA' && node.settings.workingstatus === 'working')} />
         {node.username}@{node.ip} [{node.nodeType}]
       </StorageNode.NodeIdentitiy>
       <StorageNode.ChartsContent>
+        <ControlPanel node={node} />
         <StorageNode.ChartWrapper>
           <Chart
             title="Storage Used"
@@ -55,7 +56,6 @@ const StorageNode = ({ node, onFetchedMetrics30 }) => {
             tickFormatY={value => myPrettyBytes(value, 0)}
           />
         </StorageNode.ChartWrapper>
-        <Alerts />
         <StorageNode.ChartWrapper>
           <Chart
             title="Income"
@@ -98,7 +98,7 @@ StorageNode.OnlineIndicator = styled.div`
   height: 14px;
   width: 14px;
   border-radius: 50%;
-  background: #45d428;
+  background: ${props => props.online ? '#45d428' : '#e35e68'};
   margin-right: 8px;
 `;
 
@@ -110,6 +110,7 @@ StorageNode.Wrapper = styled.div`
   box-shadow: 0 2px 9px 0 rgba(0, 0, 0, 0.1);
   width: 100%;
   box-sizing: border-box;
+  border-bottom: solid 1px rgba(0, 0, 0, 0.5);
 `;
 
 const AlertItem = ({ title, onClick, action, actionColor }) => (
@@ -147,43 +148,56 @@ const Separator = styled.div`
   margin-bottom: 8px;
 `;
 
-const Alerts = () => {
-  return null;
+const ControlPanel = ({ node }) => {
+  const wallet = R.path(['settings', 'wallet'], node);
+  const green = "#8AC64F";
+  const red = "#e35e68";
+  const dark = "#121212";
+  const isSia = !!wallet;
+  console.log(node.settings)
+
   return (
-    <Alerts.Wrapper>
-      <Alerts.Title>CONTROL PANEL</Alerts.Title>
-      <AlertItem
-        title="Wallet is locked"
-        onClick={() => { }}
-        action="UNLOCK"
-        actionColor="#e35e68"
-      />
-      <Separator />
-      <AlertItem
-        title="Storage Pricing 200SC"
-        onClick={() => { }}
-        action="+100SC"
-        actionColor="#8AC64F"
-      />
-      <Separator />
-      <AlertItem
-        title="Download Bandwidth Pricing 500SC"
-        onClick={() => { }}
-        action="+200SC"
-        actionColor="#8AC64F"
-      />
-    </Alerts.Wrapper>
+    <ControlPanel.Wrapper>
+      <ControlPanel.Title>CONTROL PANEL</ControlPanel.Title>
+      {isSia &&
+        <>
+          <AlertItem
+            title="Storage Pricing TB/Month"
+            action={node.settings}
+            action={prettyCurrency(blockToMonth(parseInt(node.settings.storageprice)) * TB, 0)}
+            actionColor={dark}
+          />
+          <Separator />
+          <AlertItem
+            title="Download Bandwidth Pricing"
+            action={prettyCurrency(parseInt(node.settings.downloadbandwidthprice) * TB, 0)}
+            actionColor={dark}
+          />
+          <Separator />
+          <AlertItem
+            title="Wallet balance"
+            action={prettyCurrency(parseInt(wallet.balance), 0)}
+            actionColor={dark}
+          />
+          <Separator />
+          <AlertItem
+            title="Wallet status"
+            action={wallet.unlocked ? 'UNLOCKED' : 'LOCKED'}
+            actionColor={wallet.unlocked ? dark : red}
+          />
+        </>}
+    </ControlPanel.Wrapper>
   );
 };
 
-Alerts.Wrapper = styled(StorageNode.ChartWrapper)`
+ControlPanel.Wrapper = styled(StorageNode.ChartWrapper)`
   font-size: 12px;
   min-width: 250px;
   padding-left: 25px;
   padding-top: 14px;
 `;
 
-Alerts.Title = styled.div`
+ControlPanel.Title = styled.div`
   color: #747aaa;
   font-weight: 600;
   letter-spacing: 2px;

@@ -1,5 +1,6 @@
 import * as R from 'ramda';
 export const SC = 1000000000000000000000000;
+export const blockToMonth = R.multiply(4320);
 export const prettyCurrency = (count, dec = 2) => (count / SC).toFixed(dec) + 'SC';
 export const extractRevenueFromRecord = record => parseInt(record.storagerevenue) +
     parseInt(record.downloadbandwidthrevenue) +
@@ -9,7 +10,7 @@ export const extractRevenueFromRecord = record => parseInt(record.storagerevenue
 const KB = 1000;
 const MB = KB * 1000;
 const GB = MB * 1000;
-const TB = GB * 1000;
+export const TB = GB * 1000;
 
 export const myPrettyBytes = (count, dec = 3) => {
     if (count > TB) return `${(count / TB).toFixed(dec)}TB`;
