@@ -38,3 +38,21 @@ export const getStorage = async (port) => {
     R.path(['data', 'folders']),
   )(resp);
 };
+
+export const getHostSettings = async host => {
+  const hostSettings = await collectHost(host.port);
+  const scoreEstimateResp = await siads[host.port].get('/host/estimatescore');
+  const walletinfo = await siads[host.port].get('/wallet');
+  const externalsettings = hostSettings.data.externalsettings;
+  return {
+    downloadbandwidthprice: externalsettings.downloadbandwidthprice,
+    uploadbandwidthprice: externalsettings.uploadbandwidthprice,
+    storageprice: externalsettings.storageprice,
+    workingstatus: hostSettings.data.workingstatus,
+    scoreestimate: scoreEstimateResp.data.conversionrate,
+    wallet: {
+      balance: walletinfo.data.confirmedsiacoinbalance,
+      unlocked: walletinfo.data.unlocked,
+    }
+  }
+} 

@@ -76,6 +76,11 @@ app.put('/node', authMiddleware, async (req, res) => {
   });
   res.send({ success: true, nodeId: resp.ops[0]._id });
 });
+app.post('/node/:id', authMiddleware, async (req, res) => {
+  // TODO: make sure that the node belongs to the user 
+  await database.updateHostSettings(req.params.id, req.body);
+  res.send({ success: true });
+});
 
 app.post('/user/metrics', authMiddleware, (req, res) =>
   res.send({ success: true }),

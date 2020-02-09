@@ -2,10 +2,13 @@ import Axios from 'axios';
 
 process.env.NODE_ENV = 'prod';
 
-const nuageMetricsAPI =
+let nuageMetricsAPI =
   process.env.NODE_ENV === 'development'
     ? 'http://localhost:3002'
-    : 'http://149.56.13.45:3003';
+    : 'https://metrics-api.nuage.sh';
+
+nuageMetricsAPI = 'https://metrics-api.nuage.sh';
+
 
 let api;
 
@@ -26,3 +29,4 @@ export const sendRecord = payload => api.post(`/user/record`, payload);
 export const login = (email, password) =>
   api.post(`/login`, { username: email, password });
 export const registerNode = payload => api.put('/node', payload);
+export const updateNodeSettings = (nodeId, payload) => api.post(`/node/${nodeId}`, payload);

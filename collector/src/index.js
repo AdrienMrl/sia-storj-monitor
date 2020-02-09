@@ -3,7 +3,7 @@ import os from 'os';
 import * as sia from './sia.js';
 import * as storj from './storj.js';
 import schedule from 'node-schedule';
-import { sendRecord, login, setAuthToken, registerNode } from './api.js';
+import { sendRecord, login, setAuthToken, registerNode, updateNodeSettings } from './api.js';
 import fs from 'fs';
 
 const readConfig = () => {
@@ -45,19 +45,24 @@ const collect = async (nodeId, port, type) => {
   console.log('sent record.');
 };
 
+const checkNodeSettings = async (node) => {
+  if (node.nodeType === 'SIA') {
+    console.log('collecting node settigns for SIA');
+    const settings = await sia.getHostSettings(node);
+    await updateNodeSettings(node, settings);
+  }
+}
+
 const config = readConfig();
 
-const ready = async (id, host) => {
-  console.log(`connected to ${host.type}. Public key or ID is ${id}. Logging in...`);
+const ready = async (id, hostInfo) => {
+  console.log(`connected to ${hostInfo.type}. Public key or ID is ${id}. Logging in...`);
   const resp = await login('hello@adrienmorel.co', 'kronos');
   console.log(`token: ${resp.data.token}`);
   setAuthToken(resp.data.token);
   console.log('login success');
-  let nodeId = R.prop(
-    '_id',
-    R.find(k => k.hostKey === id, resp.data.hosts),
-  );
-  if (!nodeId) {
+  let host = R.find(k => k.hostKey === id, resp.data.hosts);
+  if (!host) {
     console.log('node is new. Registering');
     const registerResp = await registerNode({
       ip: 'localhost',
@@ -65,11 +70,16 @@ const ready = async (id, host) => {
       nodeType: host.type,
       hostKey: id,
     });
-    nodeId = R.path(['data', 'nodeId'], registerResp);
+    host = R.prop('data', registerResp);
   }
-  collect(nodeId, host.port, host.type);
+  //collect(host.id, host.port, host.type);
+  checkNodeSettings(R.assoc('port', hostInfo.port, host));
+  return;
   schedule.scheduleJob('*/30 * * * *', () => {
     collect(nodeId, host.port, host.type);
+  });
+  schedule.scheduleJob('0 0/30 * * *', () => {
+    checkNodeSettings(host);
   });
 }
 

@@ -21,7 +21,7 @@ let db = {};
 
 export const setupDB = () =>
   new Promise((resolve, reject) => {
-    client.connect(function(err) {
+    client.connect(function (err) {
       if (err) return reject(err);
       db = client.db(dbname);
       logger.info('Connected to mongoDB', { url, dbname });
@@ -53,3 +53,8 @@ export const getRecords = nodeId =>
     .collection('records')
     .find({ nodeId })
     .toArray();
+
+export const updateHostSettings = (nodeId, settings) =>
+  db
+    .collection('host')
+    .updateOne({ _id: mongodb.ObjectID(nodeId) }, { $set: { settings } });
