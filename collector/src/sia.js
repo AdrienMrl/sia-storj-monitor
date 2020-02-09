@@ -4,6 +4,8 @@ import axios from 'axios';
 let siads = {};
 
 export const prepare = async host => {
+  if (host.port === undefined)
+    return console.error('error! host has no port');
   siads[host.port] = axios.create({
     baseURL: `http://localhost:${host.port}`,
     auth: {
@@ -22,6 +24,8 @@ export const prepare = async host => {
 }
 
 export const collectHost = async (port) => {
+  if (!siads[port])
+    throw 'error! no host on port ' + port;
   const hostData = await siads[port].get('/host');
   return hostData;
 };
@@ -40,6 +44,9 @@ export const getStorage = async (port) => {
 };
 
 export const getHostSettings = async host => {
+  if (!host.port) {
+    throw `Error! Host ${host._id} has no port`;
+  }
   const hostSettings = await collectHost(host.port);
   const scoreEstimateResp = await siads[host.port].get('/host/estimatescore');
   const walletinfo = await siads[host.port].get('/wallet');

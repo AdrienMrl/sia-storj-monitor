@@ -33,7 +33,6 @@ const collect = async (nodeId, port, type) => {
     };
   } else {
     const spaceUsed = await storj.collect(port);
-    console.log(spaceUsed);
     record = {
       type: 'STORJ',
       spaceUsed,
@@ -49,7 +48,7 @@ const checkNodeSettings = async (node) => {
   if (node.nodeType === 'SIA') {
     console.log('collecting node settigns for SIA');
     const settings = await sia.getHostSettings(node);
-    await updateNodeSettings(node, settings);
+    await updateNodeSettings(node._id, settings);
   }
 }
 
@@ -57,7 +56,7 @@ const config = readConfig();
 
 const ready = async (id, hostInfo) => {
   console.log(`connected to ${hostInfo.type}. Public key or ID is ${id}. Logging in...`);
-  const resp = await login('hello@adrienmorel.co', 'kronos');
+  const resp = await login(process.env.NODE_ENV === 'development' ? 'test@adrienmorel.co' : 'hello@adrienmorel.co', 'kronos');
   console.log(`token: ${resp.data.token}`);
   setAuthToken(resp.data.token);
   console.log('login success');
@@ -67,19 +66,20 @@ const ready = async (id, hostInfo) => {
     const registerResp = await registerNode({
       ip: 'localhost',
       username: os.userInfo().username,
-      nodeType: host.type,
+      nodeType: host.nodeType,
       hostKey: id,
     });
     host = R.prop('data', registerResp);
   }
-  //collect(host.id, host.port, host.type);
-  checkNodeSettings(R.assoc('port', hostInfo.port, host));
-  return;
+
+  collect(host._id, hostInfo.port.toString(), host.nodeType);
+  const hostWithPort = R.assoc('port', hostInfo.port, host);
+  checkNodeSettings(hostWithPort);
   schedule.scheduleJob('*/30 * * * *', () => {
-    collect(nodeId, host.port, host.type);
+    collect(host._id, host.port.toString(), host.nodeType);
   });
-  schedule.scheduleJob('0 0/30 * * *', () => {
-    checkNodeSettings(host);
+  schedule.scheduleJob('0 */30 * * *', () => {
+    checkNodeSettings(hostWithPort);
   });
 }
 
