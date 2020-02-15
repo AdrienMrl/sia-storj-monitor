@@ -66,7 +66,7 @@ const ready = async (id, hostInfo) => {
     const registerResp = await registerNode({
       ip: 'localhost',
       username: os.userInfo().username,
-      nodeType: host.nodeType,
+      nodeType: hostInfo.type,
       hostKey: id,
     });
     host = R.prop('data', registerResp);
