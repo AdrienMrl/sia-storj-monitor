@@ -1,16 +1,19 @@
 import * as R from 'ramda';
-import axios from 'axios';
 
-let siads = {};
+import axios, { AxiosInstance } from 'axios';
 
-export const prepare = async host => {
+import { Host } from './model';
+
+let siads: Record<number,AxiosInstance> = {};
+
+export const prepare = async (host: Host) => {
   if (host.port === undefined)
     return console.error('error! host has no port');
   siads[host.port] = axios.create({
     baseURL: `http://localhost:${host.port}`,
     auth: {
       username: '',
-      password: host.apipassword
+      password: host.apipassword || ''
     },
     headers: {
       common: {
@@ -23,19 +26,19 @@ export const prepare = async host => {
   return R.path(['data', 'publickey', 'key'], hostData);
 }
 
-export const collectHost = async (port) => {
+export const collectHost = async (port: number) => {
   if (!siads[port])
     throw 'error! no host on port ' + port;
   const hostData = await siads[port].get('/host');
   return hostData;
 };
 
-export const getStorage = async (port) => {
+export const getStorage = async (port: number) => {
   const resp = await siads[port].get('/host/storage');
   return R.compose(
     R.sum,
     R.map(
-      folder =>
+      (folder: any) =>
         parseInt(R.prop('capacity', folder)) -
         parseInt(R.prop('capacityremaining', folder)),
     ),
@@ -43,7 +46,7 @@ export const getStorage = async (port) => {
   )(resp);
 };
 
-export const getHostSettings = async host => {
+export const getHostSettings = async (host: Host) => {
   if (!host.port) {
     throw `Error! Host ${host._id} has no port`;
   }

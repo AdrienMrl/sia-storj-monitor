@@ -1,0 +1,10 @@
+{
+	"hosts": [
+		{
+			"type": "SIA",
+			"port": 9980,
+			"apipassword": "",
+			"walletpassword": "kronos"
+		}
+	]
+}

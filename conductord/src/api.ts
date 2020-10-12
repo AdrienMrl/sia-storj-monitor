@@ -1,4 +1,4 @@
-import Axios from 'axios';
+import Axios, { AxiosInstance } from 'axios';
 
 process.env.NODE_ENV = 'prod';
 
@@ -10,9 +10,9 @@ let nuageMetricsAPI =
 nuageMetricsAPI = 'https://metrics-api.nuage.sh';
 
 
-let api;
+let api: AxiosInstance;
 
-export const setAuthToken = token =>
+export const setAuthToken = (token: string) =>
   (api = Axios.create({
     baseURL: nuageMetricsAPI,
     headers: {
@@ -25,8 +25,8 @@ export const setAuthToken = token =>
 
 setAuthToken('');
 
-export const sendRecord = payload => api.post(`/user/record`, payload);
-export const login = (email, password) =>
+export const sendRecord = (payload: any) => api.post(`/user/record`, payload);
+export const login = (email: string, password: string) =>
   api.post(`/login`, { username: email, password });
-export const registerNode = payload => api.put('/node', payload);
-export const updateNodeSettings = (nodeId, payload) => api.post(`/node/${nodeId}`, payload);
+export const registerNode = (payload: any) => api.put('/node', payload);
+export const updateNodeSettings = (nodeId: string, payload: any) => api.post(`/node/${nodeId}`, payload);

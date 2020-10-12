@@ -1,24 +1,27 @@
 import * as R from 'ramda';
-import os from 'os';
-import * as sia from './sia.js';
-import * as storj from './storj.js';
-import schedule from 'node-schedule';
-import { sendRecord, login, setAuthToken, registerNode, updateNodeSettings } from './api.js';
+import * as sia from './sia';
+import * as storj from './storj';
+
+import { Host, HostType } from './model';
+import { login, registerNode, sendRecord, setAuthToken, updateNodeSettings } from './api';
+
 import fs from 'fs';
+import os from 'os';
+import schedule from 'node-schedule';
 
 const readConfig = () => {
   try {
-    const content = fs.readFileSync('/etc/hostmonitor/config.json');
-    return JSON.parse(content);
+    const content = fs.readFileSync('/etc/conductord/config.json');
+    return JSON.parse(content.toString());
   } catch (err) {
-    console.error(`could not read config file: ${err.message} Please create file at /etc/hostmonitor/config.json and make sure that the JSON is correct.`);
+    console.error(`could not read config file: ${err.message} Please create file at /etc/conductord/config.json and make sure that the JSON is correct.`);
     process.exit(1);
   }
 }
 
-const collect = async (nodeId, port, type) => {
+const collect = async (nodeId: string, port: number, type: HostType) => {
   let record = {};
-  if (type === 'SIA') {
+  if (type === HostType.SIA) {
     const resp = await sia.collectHost(port);
     const spaceUsed = await sia.getStorage(port);
     record = {
@@ -44,8 +47,8 @@ const collect = async (nodeId, port, type) => {
   console.log('sent record.');
 };
 
-const checkNodeSettings = async (node) => {
-  if (node.nodeType === 'SIA') {
+const checkNodeSettings = async (node: Host) => {
+  if (node.type === HostType.SIA && node._id) {
     console.log('collecting node settigns for SIA');
     const settings = await sia.getHostSettings(node);
     await updateNodeSettings(node._id, settings);
@@ -54,13 +57,13 @@ const checkNodeSettings = async (node) => {
 
 const config = readConfig();
 
-const ready = async (id, hostInfo) => {
+const ready = async (id: string, hostInfo: Host) => {
   console.log(`connected to ${hostInfo.type}. Public key or ID is ${id}. Logging in...`);
   const resp = await login(process.env.NODE_ENV === 'development' ? 'test@adrienmorel.co' : 'hello@adrienmorel.co', 'kronos');
   console.log(`token: ${resp.data.token}`);
   setAuthToken(resp.data.token);
   console.log('login success');
-  let host = R.find(k => k.hostKey === id, resp.data.hosts);
+  let host = resp.data.hosts.find((k: any) => k.hostKey === id);
   if (!host) {
     console.log('node is new. Registering');
     const registerResp = await registerNode({
@@ -72,19 +75,19 @@ const ready = async (id, hostInfo) => {
     host = R.prop('data', registerResp);
   }
 
-  collect(host._id, hostInfo.port.toString(), host.nodeType);
+  collect(host._id, hostInfo.port, host.nodeType);
   const hostWithPort = R.assoc('port', hostInfo.port, host);
   checkNodeSettings(hostWithPort);
   schedule.scheduleJob('*/30 * * * *', () => {
-    collect(host._id, host.port.toString(), host.nodeType);
+    collect(host._id, host.port, host.nodeType);
   });
   schedule.scheduleJob('0 */30 * * *', () => {
     checkNodeSettings(hostWithPort);
   });
 }
 
-config.hosts.forEach(host => {
-  if (host.type === 'SIA') {
+config.hosts.forEach((host: Host) => {
+  if (host.type === HostType.SIA) {
     console.log(`connecting to sia on port ${host.port}...`);
     sia.prepare(host).then(async SiaPubKey => {
       ready(SiaPubKey, host);

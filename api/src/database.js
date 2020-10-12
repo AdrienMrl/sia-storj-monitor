@@ -1,20 +1,21 @@
-import mongodb from 'mongodb';
 import * as R from 'ramda';
-import logger from './logger';
 
-const url = 'mongodb://localhost:27018';
+import logger from './logger';
+import mongodb from 'mongodb';
+
+const url = 'mongodb://localhost:27017';
 const dbname = 'nuage-metrics';
 const client = new mongodb.MongoClient(url, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  auth: {
-    user: 'sevauk',
-    password: 'kronos',
-    //password: 'password'
-    //  process.env.NODE_ENV === 'development'
-    //    ? 'password'
-    //    : process.env.NUAGE_MONGO_PASSWD,
-  },
+  //  auth: {
+  //    user: 'sevauk',
+  //    password: 'kronos',
+  //password: 'password'
+  //  process.env.NODE_ENV === 'development'
+  //    ? 'password'
+  //    : process.env.NUAGE_MONGO_PASSWD,
+  //  },
 });
 
 let db = {};
@@ -30,7 +31,7 @@ export const setupDB = () =>
     });
   });
 
-export const getUser = query => db.collection('user').findOne(query);
+export const getUser = (query) => db.collection('user').findOne(query);
 
 export const createUser = (email, passwordHash) =>
   db.collection('user').insertOne({
@@ -38,21 +39,15 @@ export const createUser = (email, passwordHash) =>
     passwordHash,
   });
 
-export const createRecord = payload =>
+export const createRecord = (payload) =>
   db.collection('records').insertOne(payload);
 
-export const addHost = payload => db.collection('host').insertOne(payload);
+export const addHost = (payload) => db.collection('host').insertOne(payload);
 
-export const getHostsForUser = userId =>
-  db
-    .collection('host')
-    .find({ userId })
-    .toArray();
-export const getRecords = nodeId =>
-  db
-    .collection('records')
-    .find({ nodeId })
-    .toArray();
+export const getHostsForUser = (userId) =>
+  db.collection('host').find({ userId }).toArray();
+export const getRecords = (nodeId) =>
+  db.collection('records').find({ nodeId }).toArray();
 
 export const updateHostSettings = (nodeId, settings) =>
   db

@@ -1,9 +1,12 @@
 import * as R from 'ramda';
-import axios from 'axios';
 
-let storjs = {};
+import axios, { AxiosInstance } from 'axios';
 
-export const prepare = async host => {
+import { Host } from './model';
+
+let storjs: Record<number,AxiosInstance> = {};
+
+export const prepare = async (host: Host) => {
     storjs[host.port] = axios.create({
         baseURL: `http://localhost:${host.port}`,
         headers: {
@@ -16,7 +19,7 @@ export const prepare = async host => {
     return R.path(['data', 'data', 'nodeID'], hostData);
 }
 
-export const collect = async (port) => {
+export const collect = async (port: number) => {
     const resp = await storjs[port].get('/api/dashboard');
     return R.path(['data', 'data', 'diskSpace', 'used'], resp);
 };
